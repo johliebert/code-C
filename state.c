@@ -1,108 +1,76 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<string.h>
 #include<stdbool.h>
-typedef struct 
-{
-    unsigned int tail_x; 
-    unsigned int tail_y;
-    unsigned int head_x;
-    unsigned int head_y;
-    bool live;
+#include<string.h>
+#include"state.h"
 
-}snake_t;
-
-typedef struct 
-{
-    unsigned int num_rows;
-    char **board;
-    unsigned int num_sneakes;
-    snake_t *snakes;
-
-}game_state_t;
-
-void set_board(game_state_t* state, int row, int colum, char grid)
-{
-    state->board[row][colum] = grid;
-}
+void set_board_at(game_state_t *state, unsigned int x, unsigned int y, char ch);
+/*Task 1*/
 
 game_state_t *create_default_state()
 {
+    /*dynamic memory*/
+
     game_state_t *state = malloc(sizeof(game_state_t));
     if(state == NULL)
-        fprintf(stderr, "Malloc failed\n");
-    state->num_rows = 18;
-    state->num_sneakes = 1;
+        fprintf(stderr, "allocation failed\n");
+    
+    state->board = malloc((18 * 20) * sizeof(char));
+    if(state->board == NULL)
+        fprintf(stderr, "allocation failed\n");
 
-    state->board = malloc(state->num_rows * sizeof(char *));
-    for(int i = 0; i < state->num_rows; i++)
-    {   
-        state->board[i] = malloc(20 * sizeof(char));
-        if(state->board[i] == NULL )
-            fprintf(stderr, "malloc failed]n");
-    }
+    /*create board*/
 
-/*first input all by # */
-    for(int i = 0; i < state->num_rows; i++)
+    state->board[0] = strdup("####################");
+    for(int i = 1; i < 17; i++)
     {
-        for(int j = 0; j < 20; j++)
-            set_board(state, i, j, '#');
+        state->board[i] = strdup("#                  #");
+
     }
-
-/*create space*/
-    for(int i = 1; i < state->num_rows - 1; i++)
-    {
-        for(int j = 1; j < 19; j++)
-            set_board(state, i, j, ' ');
-    }
-
-
-    state->snakes = malloc(sizeof(snake_t));
-    if(state->snakes == NULL)
-        fprintf(stderr, "Malloc failed\n");
-/*x is colum, y is row*/
-    state->snakes->tail_x = 2;
-    state->snakes->tail_y = 2;
-    state->snakes->head_x = 4;
-    state->snakes->head_y = 2;  
-    state->snakes->live = true;
-
-/* index of tail */
-    set_board(state, state->snakes->tail_y, state->snakes->tail_x, 'd');
-/* index of head */
-    set_board(state, state->snakes->head_y, state->snakes->head_x, 'D');
-/* index of fruit, zero index */
-    set_board(state, 2, 9, '*');    
+    free(state->board[2]);
+    state->board[17] = strdup("####################");
+    state->board[2]  = strdup("# d>D    *         #");
 
     return state;
 }
 
-/*Task 2*/
-void free_state(game_state_t *state)
-{
-    free(state->snakes);
-    for(int i = 0; i < state->num_rows; i++)
+/*task 2*/
+
+void free_state(game_state_t* state)
+{   
+    for(int i = 0; i < 18; i++)
     {
         free(state->board[i]);
     }
     free(state->board);
+    free(state->snakes);
     free(state);
 }
 
+void set_board_at(game_state_t *state, unsigned int x, unsigned int y, char ch)
+{
+    state->board[y][x] = ch;
+}
 
-/*Task 3*/
 void print_board(game_state_t *state, FILE* fp)
 {
-    for(int i = 0; i < state->num_rows; i++)
+    for(int i = 0; i < 18; i++)
     {
-            fprintf(fp, "%s\n", state->board[i]);
+        fprintf(fp, "%s\n", state->board[i]);
     }
 }
 
+void save_board(game_state_t *state, char* filename)
+{
+    FILE* f = fopen(filename, "w");
+    print_board(state, f);
+    fclose(f);
+}
 
 int main()
 {
-    FILE *fp = fopen("board.txt", "w");
-    print_board(create_default_state(), fp);
-    free(create_default_state());
+    game_state_t *a = create_default_state();
+    char c[80] = "unit_test_out.snk";
+    save_board(a, c);
+    free_state(a);
 }
