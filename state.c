@@ -27,6 +27,7 @@ game_state_t *create_default_state()
         state->board[i] = strdup("#                  #");
 
     }
+    /*beacause state->board[2] is already pointing to something on the heap, free it before allocating a new*/
     free(state->board[2]);
     state->board[17] = strdup("####################");
     state->board[2]  = strdup("# d>D    *         #");
