@@ -72,7 +72,6 @@ game_state_t* create_default_state() {
   if(state->board == NULL)
     fprintf(stderr, "allocation failed\n");
   
-
   create board
   strcpy(state->board[0],("####################\n"));
   for(int i = 1; i < 17; i++)
@@ -267,9 +266,7 @@ static unsigned int get_next_y(unsigned int cur_y, char c) {
 
 /*
   Task 4.2
-
   Helper function for update_state. Return the character in the cell the snake is moving into.
-
   This function should not modify anything.
 */
 static char next_square(game_state_t* state, unsigned int snum) {
@@ -289,13 +286,9 @@ static char next_square(game_state_t* state, unsigned int snum) {
 
 /*
   Task 4.3
-
   Helper function for update_state. Update the head...
-
   ...on the board: add a character where the snake is moving
-
   ...in the snake struct: update the x and y coordinates of the head
-
   Note that this function ignores food, walls, and snake bodies when moving the head.
 */
 static void update_head(game_state_t* state, unsigned int snum) {
@@ -310,25 +303,20 @@ static void update_head(game_state_t* state, unsigned int snum) {
       }
       if(state->board[i][j] == 'W' || state->board[i][j] == 'S') {
         state->snakes->head_y = get_next_y(state->snakes->head_y, state->board[i][j]);
-        printf("%d\n", state->snakes->head_y);
         state->board[state->snakes->head_y][j] = state->board[i][j];
         state->board[i][j] = head_to_body(state->board[i][j]);
         break;
       }
     }
   }
-
   return;
 }
 
 /*
   Task 4.4
-
   Helper function for update_state. Update the tail...
-
   ...on the board: blank out the current tail, and change the new
   tail from a body character (^v<>) into a tail character (wasd)
-
   ...in the snake struct: update the x and y coordinates of the tail
 */
 static void update_tail(game_state_t* state, unsigned int snum) {
@@ -341,6 +329,12 @@ static void update_tail(game_state_t* state, unsigned int snum) {
         state->board[i][j] = ' ';
         break;
       }
+      if(state->board[i][j] == 'w' || state->board[i][j] == 's') {
+        state->snakes->tail_y = get_next_y(state->snakes->tail_y, state->board[i][j]);
+        state->board[state->snakes->tail_y][j] = body_to_tail(state->board[state->snakes->tail_y][j]);
+        state->board[i][j] = ' ';
+        break;
+      }
     }
   }
   return;
@@ -350,10 +344,27 @@ static void update_tail(game_state_t* state, unsigned int snum) {
 /* Task 4.5 */
 void update_state(game_state_t* state, int (*add_food)(game_state_t* state)) {
   // TODO: Implement this function.
+  if(next_square(state, 0) == ' ') {
+    update_head(state, 0);
+    update_tail(state, 0);
+  }
+  else if(next_square(state, 0) == '*') {
+    update_head(state, 0);
+    add_food(state);
+  }
+  else if(next_square(state, 0) == '#' || is_tail(next_square(state, 0))) {
+    for(int i = 0; i < 18; i++) {
+      for(int j = 0; j < 20; j++) {
+        if(is_head(state->board[i][j])) {
+          state->board[i][j] = 'x';
+        }
+      }
+    }
+    state->snakes->live = false;
+  }
   return;
 }
-
-
+  
 /* Task 5 */
 game_state_t* load_board(char* filename) {
   // TODO: Implement this function.
@@ -363,7 +374,6 @@ game_state_t* load_board(char* filename) {
 
 /*
   Task 6.1
-
   Helper function for initialize_snakes.
   Given a snake struct with the tail coordinates filled in,
   trace through the board to find the head coordinates, and
