@@ -271,17 +271,10 @@ static unsigned int get_next_y(unsigned int cur_y, char c) {
 */
 static char next_square(game_state_t* state, unsigned int snum) {
   // TODO: Implement this function.
-  for(int i = 0; i < 18; i++) {
-    for(int j = 0; j < 20; j++) {
-      if(state->board[i][j] == 'D' || state->board[i][j] == 'A') {
-        return state->board[i][get_next_x(j, state->board[i][j])];
-      }
-      if(state->board[i][j] == 'W' || state->board[i][j] == 'S') {
-        return state->board[get_next_y(i, state->board[i][j])][j];
-      }
-    }
-  }
-  return 0;
+  unsigned int head_x = state->snakes[snum].head_x;
+  unsigned int head_y = state->snakes[snum].head_y;
+  char ch = get_board_at(state, head_x, head_y);
+  return get_board_at(state, get_next_x(head_x, ch), get_next_y(head_y, ch));
 }
 
 /*
