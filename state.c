@@ -321,7 +321,7 @@ void update_state(game_state_t* state, int (*add_food)(game_state_t* state)) {
 /* Task 5 */
 game_state_t* load_board(char* filename) {
   // TODO: Implement this function.
-  char c;
+  int c;
   unsigned int *x; // size of colum (each row can different colum)
   unsigned int y = 0; // size of row
 
@@ -330,35 +330,38 @@ game_state_t* load_board(char* filename) {
     printf("dynamic error!\n");
     exit(0);
   }
+
   FILE *f = fopen(filename, "r");
   if(f = NULL) {
     printf("can't open file!\n");
     exit(0);
   }
+
   do 
   {
     c = fgetc(f);
+    // count sizeof colum of each row
     if(c != '\n') 
-      x[y]++;
+      x[y]++; 
+    //count row
     else {
       y++;
     }
   } while (c != EOF);
-  printf("%d\n", y);
-  for(int i = 0; i < y; i++) {
-    printf("%d\n", x[i]);
-  }
+
   state->num_rows = y;
   state->board = malloc(y * sizeof(char *));
   if(state->board = NULL) {
     printf("dynamic error!");
   }
+
   for(int i = 0; i < y; i++) {
     state->board[i] = malloc(x[y] * sizeof(char));
     if(state->board[i] == NULL)
       printf("dynamic error!");
   }
   fclose(f);
+
   return state;
 }
 
