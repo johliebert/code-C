@@ -6,7 +6,7 @@
 #include "state.h"
 
 /* Helper function definitions */
-static void set_board_at(game_state_t* state, int x, int y, char ch);
+static void set_board_at(game_state_t* state, unsigned int x, unsigned int y, char ch);
 static bool is_tail(char c);
 static bool is_head(char c);
 static bool is_snake(char c);
@@ -45,8 +45,8 @@ game_state_t* create_default_state() {
   state->snakes->tail_y = 2;
   state->snakes->live = true;
 
-  for(int i = 0; i < 18; i++) {
-    for(int j = 0; j < 20; j++) {
+  for(unsigned int i = 0; i < 18; i++) {
+    for(unsigned int j = 0; j < 20; j++) {
       if(i == 0 || j == 0 || i == 17 || j == 19) {
         set_board_at(state, j, i, '#');
       }
@@ -67,22 +67,6 @@ game_state_t* create_default_state() {
       }
     }
   }
-
-  /*state->board = malloc((18 * 20) * sizeof(char));
-  if(state->board == NULL)
-    fprintf(stderr, "allocation failed\n");
-  
-  create board
-  strcpy(state->board[0],("####################\n"));
-  for(int i = 1; i < 17; i++)
-  {
-    strcpy(state->board[i], ("#                  #\n"));
-  }
-  beacause state->board[2] is already pointing to something on the heap, free it before allocating a new
-  free(state->board[2]);
-  strcpy(state->board[17], ("####################\n"));
-  strcpy(state->board[2], ("# d>D    *         #\n"));
-  */
   return state;
 }
 
@@ -133,7 +117,7 @@ char get_board_at(game_state_t* state, unsigned int x, unsigned int y) {
   Helper function to set a character on the board
   (already implemented for you).
 */
-static void set_board_at(game_state_t* state, int x, int y, char ch) {
+static void set_board_at(game_state_t* state, unsigned int x, unsigned int y, char ch) {
   state->board[y][x] = ch;
 }
 
@@ -315,7 +299,7 @@ static void update_tail(game_state_t* state, unsigned int snum) {
 void update_state(game_state_t* state, int (*add_food)(game_state_t* state)) {
   // TODO: Implement this function.
   // i is snum
-  for(int i = 0; i < state->num_snakes; i++) {
+  for(unsigned int i = 0; i < state->num_snakes; i++) {
     if(state->snakes->live == true) {
       if(next_square(state, 0) == '#' || is_snake(next_square(state, 0))) {
         set_board_at(state, state->snakes[i].head_x, state->snakes[i]. head_y, 'x');
@@ -337,7 +321,57 @@ void update_state(game_state_t* state, int (*add_food)(game_state_t* state)) {
 /* Task 5 */
 game_state_t* load_board(char* filename) {
   // TODO: Implement this function.
-  return NULL;
+  game_state_t* state = malloc(sizeof(game_state_t));
+  if(state = NULL) {
+    printf("dynamic error!\n");
+    exit(0);
+  }
+
+  FILE *f = fopen(filename, "r");
+  if(f = NULL) {
+    printf("can't open file!\n");
+    exit(0);
+  }
+
+  char c;
+  unsigned int x;
+  unsigned int y = 0;
+  unsigned int total = 0;
+  do 
+  {
+    c = fgetc(f);
+    if(c != '\n') {
+      total++;
+    }
+    else { 
+      y++;
+    }
+
+  }while (c != EOF);
+  x = total / y;
+  state->num_rows = y;
+  state->board = malloc(y * sizeof(char *));
+  if(state->board = NULL) {
+    printf("dynamic error!");
+  }
+
+  for(int i = 0; i < y; i++) {
+    state->board[i] = malloc(x * sizeof(char));
+    if(state->board[i] == NULL)
+      printf("dynamic error!");
+  }
+
+  char buffer[x + 2];
+  int i = 0;
+  rewind(f);
+  while ((fgets(buffer, x + 2, f)) != NULL) {
+    buffer[strcspn(buffer, "\n")] = 0;
+    strcpy(state->board[i], buffer);
+    i++;
+  }
+  fclose(f);
+
+  return state;
 }
 
 
