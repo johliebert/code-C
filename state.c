@@ -356,7 +356,7 @@ game_state_t* load_board(char* filename) {
   }
 
   for(int i = 0; i < y; i++) {
-    state->board[i] = malloc(x[y] * sizeof(char));
+    state->board[i] = malloc(x[i] * sizeof(char));
     if(state->board[i] == NULL)
       printf("dynamic error!");
   }
