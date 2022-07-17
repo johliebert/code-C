@@ -321,56 +321,44 @@ void update_state(game_state_t* state, int (*add_food)(game_state_t* state)) {
 /* Task 5 */
 game_state_t* load_board(char* filename) {
   // TODO: Implement this function.
+  char c;
+  unsigned int *x; // size of colum (each row can different colum)
+  unsigned int y = 0; // size of row
+
   game_state_t* state = malloc(sizeof(game_state_t));
   if(state = NULL) {
     printf("dynamic error!\n");
     exit(0);
   }
-
   FILE *f = fopen(filename, "r");
   if(f = NULL) {
     printf("can't open file!\n");
     exit(0);
   }
-
-  char c;
-  unsigned int x;
-  unsigned int y = 0;
-  unsigned int total = 0;
   do 
   {
     c = fgetc(f);
-    if(c != '\n') {
-      total++;
-    }
-    else { 
+    if(c != '\n') 
+      x[y]++;
+    else {
       y++;
     }
-
-  }while (c != EOF);
-  x = total / y;
+  } while (c != EOF);
+  printf("%d\n", y);
+  for(int i = 0; i < y; i++) {
+    printf("%d\n", x[i]);
+  }
   state->num_rows = y;
   state->board = malloc(y * sizeof(char *));
   if(state->board = NULL) {
     printf("dynamic error!");
   }
-
   for(int i = 0; i < y; i++) {
-    state->board[i] = malloc(x * sizeof(char));
+    state->board[i] = malloc(x[y] * sizeof(char));
     if(state->board[i] == NULL)
       printf("dynamic error!");
   }
-
-  char buffer[x + 2];
-  int i = 0;
-  rewind(f);
-  while ((fgets(buffer, x + 2, f)) != NULL) {
-    buffer[strcspn(buffer, "\n")] = 0;
-    strcpy(state->board[i], buffer);
-    i++;
-  }
   fclose(f);
-
   return state;
 }
 
