@@ -320,48 +320,34 @@ void update_state(game_state_t* state, int (*add_food)(game_state_t* state)) {
   
 /* Task 5 */
 game_state_t* load_board(char* filename) {
-  // TODO: Implement this function.
-  int c;
-  unsigned int *x; // size of colum (each row can different colum)
-  unsigned int y = 0; // size of row
-
-  game_state_t* state = malloc(sizeof(game_state_t));
-  if(state = NULL) {
-    printf("dynamic error!\n");
-    exit(0);
-  }
-
+  char line[80];
+  unsigned int i = 0;
   FILE *f = fopen(filename, "r");
-  if(f = NULL) {
-    printf("can't open file!\n");
-    exit(0);
+  if(f == NULL) {
+    fprintf(stderr, "dynamic error!");
   }
-
-  do 
-  {
-    c = fgetc(f);
-    // count sizeof colum of each row
-    if(c != '\n') 
-      x[y]++; 
-    //count row
-    else {
-      y++;
+  while(fgets(line, 80, f)) {
+    i++;
+  }
+  rewind(f);
+  game_state_t* state = malloc(sizeof(game_state_t));
+  if(state == NULL) {
+    fprintf(stderr, "dynamic error!");
+  }
+  unsigned int j = 0;
+  state->board = malloc(i * sizeof(char *));
+  while(fgets(line, 80, f)) {
+    line[strlen(line) - 1] = '\0';
+    state->board[j] = malloc(strlen(line) * sizeof(char));
+    if(state->board[j] == NULL) {
+      fprintf(stderr, "dynamic error!");
     }
-  } while (c != EOF);
-
-  state->num_rows = y;
-  state->board = malloc(y * sizeof(char *));
-  if(state->board = NULL) {
-    printf("dynamic error!");
+    strcpy(state->board[j], line);
+    j++;
   }
+  state->num_rows = i;
 
-  for(int i = 0; i < y; i++) {
-    state->board[i] = malloc(x[i] * sizeof(char));
-    if(state->board[i] == NULL)
-      printf("dynamic error!");
-  }
   fclose(f);
-
   return state;
 }
 
@@ -375,6 +361,17 @@ game_state_t* load_board(char* filename) {
 */
 static void find_head(game_state_t* state, unsigned int snum) {
   // TODO: Implement this function.
+  for(unsigned int i = 1; i < 17; i++) {
+    for(unsigned int j = 1; j < 20; j++) {
+      if(is_head(state->board[i][j])) {
+        state->snakes[snum].head_x = j;
+        state->snakes[snum].head_y = i;
+      }
+     if(state->board[i][j] == '#') {
+      break;
+     }
+    } 
+  }
   return;
 }
 
